@@ -56,10 +56,9 @@ class GameDetails(APIView):
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
         winner = game.check_winner()
 
-        if not skip_AI:
+        if not skip_AI and winner == 0:
             grid = game.make_AI_move()
-            if winner == 0:
-                winner = game.check_winner()
+            winner = game.check_winner()
         game_status = 'Playing' if winner == 0 else 'Finished'
 
         serializer = GameSerializer(
