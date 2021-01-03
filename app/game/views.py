@@ -39,11 +39,12 @@ class GameDetails(APIView):
 
     def put(self, request, pk):
         game = self.get_object(pk)
-        row = request.data['row']
-        col = request.data['col']
-        testingClient = False
-        if 'test' in request.data and request.data['test']:
-            testingClient = True
+        row = request.data.get('row')
+        col = request.data.get('col')
+        skip_AI = (
+            True if 'skip_AI' in request.data and
+            request.data['skip_AI'] else False
+        )
 
         try:
             grid = game.make_move(row, col)
@@ -53,11 +54,11 @@ class GameDetails(APIView):
         except IndexError as e:
             message = {'detail': str(e)}
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
-
         winner = game.check_winner()
-        if not testingClient:
+
+        if not skip_AI:
             grid = game.make_AI_move()
-            if winner is not 0:
+            if winner == 0:
                 winner = game.check_winner()
         game_status = 'Playing' if winner == 0 else 'Finished'
 

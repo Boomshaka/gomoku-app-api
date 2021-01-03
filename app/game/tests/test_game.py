@@ -27,7 +27,7 @@ class GameTests(TestCase):
         """Test that game piece can be placed in grid with PUT request"""
         game = self.client.post('/game/')
         game_id = game.data['id']
-        payload = {'row': 7, 'col': 7, 'test': True}
+        payload = {'row': 7, 'col': 7, 'skip_AI': True}
         res = self.client.put(
             f'/game/{game_id}/',
             data=payload,
@@ -41,7 +41,7 @@ class GameTests(TestCase):
         """Test that invalid col index returns an index error"""
         game = self.client.post('/game/')
         game_id = game.data['id']
-        payload = {'row': 0, 'col': -1, 'test': True}
+        payload = {'row': 0, 'col': -1, 'skip_AI': True}
         res = self.client.put(
             f'/game/{game_id}/',
             data=payload,
@@ -53,7 +53,7 @@ class GameTests(TestCase):
         """Test that invalid row index returns an index error"""
         game = self.client.post('/game/')
         game_id = game.data['id']
-        payload = {'row': -1, 'col': 0, 'test': True}
+        payload = {'row': -1, 'col': 0, 'skip_AI': True}
         res = self.client.put(
             f'/game/{game_id}/',
             data=payload,
@@ -65,7 +65,7 @@ class GameTests(TestCase):
         """Test that making a move in index with preexisting piece fails"""
         game = self.client.post('/game/')
         game_id = game.data['id']
-        payload = {'row': 0, 'col': 0, 'test': True}
+        payload = {'row': 0, 'col': 0, 'skip_AI': True}
         self.client.put(
             f'/game/{game_id}/',
             data=payload,
@@ -83,11 +83,11 @@ class GameTests(TestCase):
         game = self.client.post('/game/')
         game_id = game.data['id']
         payload = [
-            {'row': 0, 'col': 0, 'test': True},
-            {'row': 0, 'col': 1, 'test': True},
-            {'row': 0, 'col': 2, 'test': True},
-            {'row': 0, 'col': 3, 'test': True},
-            {'row': 0, 'col': 4, 'test': True}
+            {'row': 0, 'col': 0, 'skip_AI': True},
+            {'row': 0, 'col': 1, 'skip_AI': True},
+            {'row': 0, 'col': 2, 'skip_AI': True},
+            {'row': 0, 'col': 3, 'skip_AI': True},
+            {'row': 0, 'col': 4, 'skip_AI': True}
         ]
         res = None
         for p in payload:
@@ -105,11 +105,11 @@ class GameTests(TestCase):
         game = self.client.post('/game/')
         game_id = game.data['id']
         payload = [
-            {'row': 0, 'col': 0, 'test': True},
-            {'row': 1, 'col': 0, 'test': True},
-            {'row': 2, 'col': 0, 'test': True},
-            {'row': 3, 'col': 0, 'test': True},
-            {'row': 4, 'col': 0, 'test': True}
+            {'row': 0, 'col': 0, 'skip_AI': True},
+            {'row': 1, 'col': 0, 'skip_AI': True},
+            {'row': 2, 'col': 0, 'skip_AI': True},
+            {'row': 3, 'col': 0, 'skip_AI': True},
+            {'row': 4, 'col': 0, 'skip_AI': True}
         ]
         res = None
         for p in payload:
@@ -127,11 +127,11 @@ class GameTests(TestCase):
         game = self.client.post('/game/')
         game_id = game.data['id']
         payload = [
-            {'row': 0, 'col': 0, 'test': True},
-            {'row': 1, 'col': 1, 'test': True},
-            {'row': 2, 'col': 2, 'test': True},
-            {'row': 3, 'col': 3, 'test': True},
-            {'row': 4, 'col': 4, 'test': True}
+            {'row': 0, 'col': 0, 'skip_AI': True},
+            {'row': 1, 'col': 1, 'skip_AI': True},
+            {'row': 2, 'col': 2, 'skip_AI': True},
+            {'row': 3, 'col': 3, 'skip_AI': True},
+            {'row': 4, 'col': 4, 'skip_AI': True}
         ]
         res = None
         for p in payload:
@@ -143,6 +143,27 @@ class GameTests(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.data['status'], 'Finished')
         self.assertEqual(res.data['winner'], 1)
+
+    def test_AI_make_move_successful(self):
+        """Test that AI makes move after player"""
+        game = self.client.post('/game/')
+        game_id = game.data['id']
+        payload = {'row': 7, 'col': 7}
+        res = self.client.put(
+            f'/game/{game_id}/',
+            data=payload,
+            content_type='application/json'
+        )
+
+        numTwo = 0
+        for row in res.data['grid']:
+            for num in row:
+                if num == 2:
+                    numTwo += 1
+        self.assertIn(1, res.data['grid'][7])
+        self.assertEqual(numTwo, 1)
+        self.assertEqual(res.data['status'], 'Playing')
+        self.assertEqual(res.data['winner'], 0)
 
 
 class GameFunctionalityTests(TestCase):
@@ -196,3 +217,17 @@ class GameFunctionalityTests(TestCase):
             (8, 5)
         ]
         self.assertEqual(additional_choices, expected_additional_choices)
+
+    def test_AI_eval_grid_score(self):
+        """Test that AI properly evaluates grid score"""
+        movesets = [
+            (7, 7),
+            (7, 8),
+            (7, 9)
+        ]
+        for move in movesets:
+            self.game.make_ghost_move((move[0], move[1]), player_turn=1)
+        score_straight_three = self.game.evaluate_board_score()
+        self.game.make_ghost_move((7, 10), player_turn=2)
+        score_three = self.game.evaluate_board_score()
+        self.assertLess(score_straight_three, score_three)
