@@ -6,7 +6,6 @@ from game.models import Game
 from game.serializers import GameSerializer
 
 
-
 class GameAPIView(APIView):
 
     def get(self, request):
