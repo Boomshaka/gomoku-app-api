@@ -43,3 +43,12 @@ class Game(models.Model):
         max_length=20
     )
     date = models.DateTimeField(auto_now_add=True)
+
+    def make_move(self, row, col, player=1):
+        grid = self.grid
+        if row < 0 or col < 0 or row >= 15 or col >= 15:
+            raise IndexError("Board column and row must be between 0 and 15")
+        if grid[row][col] != 0:
+            raise ValueError("Index already contains a gamepiece")
+        grid[row][col] = 1
+        return grid

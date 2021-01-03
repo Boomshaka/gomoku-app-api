@@ -36,3 +36,29 @@ class GameDetails(APIView):
         game = self.get_object(pk)
         serializer = GameSerializer(game)
         return Response(serializer.data)
+
+    def put(self, request, pk):
+        game = self.get_object(pk)
+        row = request.data['row']
+        col = request.data['col']
+
+        try:
+            grid = game.make_move(row, col)
+        except ValueError as e:
+            message = {'detail': str(e)}
+            return Response(message, status=status.HTTP_400_BAD_REQUEST)
+        except IndexError as e:
+            message = {'detail': str(e)}
+            return Response(message, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = GameSerializer(
+            game,
+            data={
+                'grid': grid,
+                'status': 'Playing'
+            }
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
