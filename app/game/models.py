@@ -14,8 +14,10 @@ from game.const import (
 GRID_SIZE = 15
 
 
-def generate_empty_grid():
-    return [[0 for x in range(GRID_SIZE)] for y in range(GRID_SIZE)]
+def generate_start_grid():
+    grid = [[0 for x in range(GRID_SIZE)] for y in range(GRID_SIZE)]
+    grid[7][7] = 2
+    return grid
 
 
 class Game(models.Model):
@@ -40,7 +42,7 @@ class Game(models.Model):
     grid = ArrayField(
         ArrayField(models.IntegerField(blank=True, default=0)),
         blank=True,
-        default=generate_empty_grid
+        default=generate_start_grid
     )
     winner = models.IntegerField(
         choices=WINNER_CHOICES,
@@ -54,7 +56,7 @@ class Game(models.Model):
         max_length=20
     )
     date = models.DateTimeField(auto_now_add=True)
-    ghost_grid = generate_empty_grid()
+    ghost_grid = generate_start_grid()
 
     def get(self, row, col):
         """Get value at given row,col position"""
