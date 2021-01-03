@@ -44,6 +44,8 @@ class GameDetails(APIView):
 
         try:
             grid = game.make_move(row, col)
+            winner = game.check_winner()
+            game_status = 'Playing' if winner == 0 else 'Finished'
         except ValueError as e:
             message = {'detail': str(e)}
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
@@ -55,7 +57,8 @@ class GameDetails(APIView):
             game,
             data={
                 'grid': grid,
-                'status': 'Playing'
+                'status': game_status,
+                'winner': winner
             }
         )
         if serializer.is_valid():
