@@ -14,10 +14,8 @@ from game.const import (
 GRID_SIZE = 15
 
 
-def generate_start_grid():
-    grid = [[0 for x in range(GRID_SIZE)] for y in range(GRID_SIZE)]
-    grid[7][7] = 2
-    return grid
+def generate_empty_grid():
+    return [[0 for x in range(GRID_SIZE)] for y in range(GRID_SIZE)]
 
 
 class Game(models.Model):
@@ -42,7 +40,7 @@ class Game(models.Model):
     grid = ArrayField(
         ArrayField(models.IntegerField(blank=True, default=0)),
         blank=True,
-        default=generate_start_grid
+        default=generate_empty_grid
     )
     winner = models.IntegerField(
         choices=WINNER_CHOICES,
@@ -56,7 +54,6 @@ class Game(models.Model):
         max_length=20
     )
     date = models.DateTimeField(auto_now_add=True)
-    ghost_grid = generate_start_grid()
 
     def get(self, row, col):
         """Get value at given row,col position"""
@@ -179,13 +176,9 @@ class Game(models.Model):
         for i in mygenerator:
             for j in range(len(ONE_5)):
                 if i == ONE_5[j]:
-                    score['one'] += (SCORE_5[j]
-                                     * len(mygenerator)
-                                     + len(mygenerator))
+                    score['one'] += SCORE_5[j]
                 if i == TWO_5[j]:
-                    score['two'] += (SCORE_5[j]
-                                     * len(mygenerator)
-                                     + len(mygenerator))
+                    score['two'] += SCORE_5[j]
 
         mygenerator = list(self.window(vector, 6))
 
@@ -194,14 +187,9 @@ class Game(models.Model):
         for i in mygenerator:
             for j in range(len(ONE_6)):
                 if i == ONE_6[j]:
-                    score['one'] += (SCORE_6[j]
-                                     * len(mygenerator)
-                                     + len(mygenerator))
+                    score['one'] += SCORE_6[j]
                 if i == TWO_6[j]:
-                    score['two'] += (SCORE_6[j]
-                                     * len(mygenerator)
-                                     + len(mygenerator))
-
+                    score['two'] += SCORE_6[j]
         return score
 
     def evaluate_board_score(self):
@@ -215,18 +203,18 @@ class Game(models.Model):
 
         # Look through vertical and horizontal lines
         for i in range(GRID_SIZE):
-            vectors.append(self.ghost_grid[i])
+            vectors.append(self.grid[i])
         for j in range(0, GRID_SIZE):
             vectors.append(list(
-                self.ghost_grid[x][j] for x in range(GRID_SIZE)
+                self.grid[x][j] for x in range(GRID_SIZE)
             ))
 
         # Look through the 2 diagonal lines extending from the corner
         vectors.append(list(
-            self.ghost_grid[x][x] for x in range(GRID_SIZE)
+            self.grid[x][x] for x in range(GRID_SIZE)
         ))
         vectors.append(list(
-            self.ghost_grid[x][GRID_SIZE - x - 1] for x in range(GRID_SIZE)
+            self.grid[x][GRID_SIZE - x - 1] for x in range(GRID_SIZE)
         ))
 
         # Look through the rest of the diagonal
@@ -234,28 +222,31 @@ class Game(models.Model):
         if GRID_SIZE >= 6:
             for i in range(1, GRID_SIZE - 4):
                 vectors.append(list((
-                    self.ghost_grid[row][row - i]
+                    self.grid[row][row - i]
                     for row in range(i, GRID_SIZE)
                 )))
                 vectors.append(list((
-                    self.ghost_grid[col - i][col]
+                    self.grid[col - i][col]
                     for col in range(i, GRID_SIZE)
                 )))
 
             for i in range(4, GRID_SIZE - 1):
                 vectors.append(list(
-                    self.ghost_grid[i - x][x] for x in range(i, -1, -1)
+                    self.grid[i - x][x] for x in range(i, -1, -1)
                 ))
                 vectors.append(list((
-                    self.ghost_grid
+                    self.grid
                     [GRID_SIZE - 1 - x]
                     [GRID_SIZE - 1 - (i - x)]
                     for x in range(i, -1, -1)
                 )))
 
+        # print("VECTORS ARE:\n\n")
+        # for v in vectors:
+        #     print(v)
         for v in vectors:
             score = self.evaluate_vector(v)
-            board_score += score['two'] - score['one']
+            board_score += score['one'] - score['two']
         return board_score
 
     def minimax(
@@ -301,7 +292,7 @@ class Game(models.Model):
         new_choice = None
 
         # AI wants to maximize the gain
-        if max_player == 2:
+        if max_player == 1:
             maxVal = float("-inf")
             for choice in new_choices:
                 # If we're at the top node,
@@ -317,7 +308,7 @@ class Game(models.Model):
                     max_depth=max_depth,
                     alpha=alpha,
                     beta=beta,
-                    max_player=1,
+                    max_player=2,
                     temp_choice=choice,
                     store_choice=store_choice
                 )
@@ -356,7 +347,7 @@ class Game(models.Model):
                     max_depth=max_depth,
                     alpha=alpha,
                     beta=beta,
-                    max_player=2,
+                    max_player=1,
                     temp_choice=choice,
                     store_choice=store_choice
                 )
@@ -384,19 +375,19 @@ class Game(models.Model):
 
     def make_ghost_move(self, choice, player_turn):
         """
-            Makes a move into the ghost_grid
+            Makes a move into the grid
             Argument for player turn is required unlike make_move,
             because minimax searches with depth = 2
             meaning that ghost grid can represent
             board states up to 2 moves ahead.
         """
         if choice is not None:
-            self.ghost_grid[choice[0]][choice[1]] = player_turn
+            self.grid[choice[0]][choice[1]] = player_turn
 
     def remove_ghost_move(self, choice):
         """Erase a filled slot on the ghost grid"""
         if choice is not None:
-            self.ghost_grid[choice[0]][choice[1]] = 0
+            self.grid[choice[0]][choice[1]] = 0
 
     def choose_AI_move(self):
         """Call onto minimax algorithm to find the optimal move for AI"""
@@ -406,7 +397,7 @@ class Game(models.Model):
             max_depth=2,
             alpha=-1000000000,
             beta=1000000000,
-            max_player=2
+            max_player=1
         )
         return val
 
@@ -414,19 +405,18 @@ class Game(models.Model):
         val = self.choose_AI_move()
         row = val.get('choice')[0]
         col = val.get('choice')[1]
-        return self.make_move(row, col, player=2)
+        return self.make_move(row, col, player=1)
 
-    def make_move(self, row, col, player=1):
+    def make_move(self, row, col, player=2):
         """Fills grid index specified by row,col"""
-        grid = self.grid
         if row < 0 or col < 0 or row >= GRID_SIZE or col >= GRID_SIZE:
             raise IndexError(
                 f"Board column and row must be between 0 and {GRID_SIZE}"
             )
-        if grid[row][col] != 0:
+        if self.grid[row][col] != 0:
             raise ValueError("Index already contains a gamepiece")
-        grid[row][col] = player
-        return grid
+        self.grid[row][col] = player
+        return self.grid
 
     def check_winner(self):
         """
