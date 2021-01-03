@@ -11,7 +11,7 @@ class GameTests(TestCase):
         new_game = self.client.post('/game/')
         game_id = new_game.data['id']
         game = self.client.get(f'/game/{game_id}')
-        self.assertContains(game,'id',count=1,status_code=200)
+        self.assertContains(game, game_id, count=1, status_code=200)
 
     def test_create_game_successful(self):
         """Test creating a new game is successful"""
