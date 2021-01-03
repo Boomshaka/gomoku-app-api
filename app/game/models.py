@@ -52,6 +52,104 @@ class Game(models.Model):
             return 0
         return self.grid[row][col]
 
+    def has_neighbor(self, row, col):
+        """
+            Check whether a given row,
+            col index has any neighboring game piece
+        """
+        directions = [
+            (-1, -1),
+            (-1, 0),
+            (-1, 1),
+            (0, -1),
+            (0, 0),
+            (0, 1),
+            (1, -1),
+            (1, 0),
+            (1, 1)
+        ]
+        if self.grid[row][col] != 0:
+            return False
+        for (xdirection, ydirection) in directions:
+            if (xdirection != 0 and
+                    ((col + xdirection) < 0 or
+                     (col + xdirection) >= GRID_SIZE)):
+                continue
+            if (ydirection != 0 and
+                    ((row + ydirection) < 0 or
+                     (row + ydirection) >= GRID_SIZE)):
+                continue
+            if self.grid[row + ydirection][col + xdirection] != 0:
+                # print(f"neighbor at [{row}][{col}]")
+                return True
+        return False
+
+    def find_choices(self):
+        """Returns list of moves the AI will consider"""
+        choices = []
+        for i in range(GRID_SIZE):
+            for j in range(GRID_SIZE):
+                if self.grid[i][j] != 0:
+                    continue
+                if not self.has_neighbor(i, j):
+                    continue
+                choices.append((i, j))
+        return choices
+
+    def add_new_choices(self, choice, existing_choices):
+        """
+            Upon making a new move,
+            returns a list of additional moves the AI may consider
+        """
+        directions = [
+            (-1, -1),
+            (-1, 0),
+            (-1, 1),
+            (0, -1),
+            (0, 0),
+            (0, 1),
+            (1, -1),
+            (1, 0),
+            (1, 1)
+        ]
+        additional_choices = []
+        if choice is not None:
+            for (xdirection, ydirection) in directions:
+                if (xdirection != 0 and
+                        ((choice[1] + xdirection) < 0 or
+                         (choice[1] + xdirection) >= GRID_SIZE)):
+                    continue
+                if (ydirection != 0 and
+                        ((choice[0] + ydirection) < 0 or
+                         (choice[0] + ydirection) >= GRID_SIZE)):
+                    continue
+                if ((self.grid[choice[0] + ydirection]
+                    [choice[1] + xdirection] == 0) and
+                        (choice[0] + ydirection, choice[1] + xdirection)
+                        not in existing_choices):
+                    additional_choices.append(
+                        (choice[0] + ydirection, choice[1] + xdirection)
+                    )
+        return additional_choices
+
+    def choose_AI_move(self):
+        """Call onto minimax algorithm to find the optimal move for AI"""
+        choices = self.find_choices()
+        val = self.minimax(
+            choices, depth=2,
+            max_depth=2,
+            alpha=-1000000000,
+            beta=1000000000,
+            max_player=1
+        )
+        return val
+
+    def make_AI_move(self):
+        val = self.choose_AI_move()
+        row = val.get('choice')[0]
+        col = val.get('choice')[1]
+        return self.make_move(row, col, player=2)
+
     def make_move(self, row, col, player=1):
         """
             Fills grid index specified by row,col

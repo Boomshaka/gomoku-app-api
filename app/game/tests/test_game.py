@@ -1,4 +1,7 @@
 from django.test import TestCase, Client
+from game.models import Game
+# from game.serializers import GameSerializer
+# from unittest.mock import patch
 
 
 class GameTests(TestCase):
@@ -24,22 +27,21 @@ class GameTests(TestCase):
         """Test that game piece can be placed in grid with PUT request"""
         game = self.client.post('/game/')
         game_id = game.data['id']
-        payload = {'row': 7, 'col': 7}
+        payload = {'row': 7, 'col': 7, 'test': True}
         res = self.client.put(
             f'/game/{game_id}/',
             data=payload,
             content_type='application/json'
         )
-        self.assertContains(res, game_id, count=1, status_code=200)
         self.assertIn(1, res.data['grid'][7])
-        self.assertEquals(res.data['status'], 'Playing')
-        self.assertEquals(res.data['winner'], 0)
+        self.assertEqual(res.data['status'], 'Playing')
+        self.assertEqual(res.data['winner'], 0)
 
     def test_invalid_index_col(self):
         """Test that invalid col index returns an index error"""
         game = self.client.post('/game/')
         game_id = game.data['id']
-        payload = {'row': 0, 'col': -1}
+        payload = {'row': 0, 'col': -1, 'test': True}
         res = self.client.put(
             f'/game/{game_id}/',
             data=payload,
@@ -51,7 +53,7 @@ class GameTests(TestCase):
         """Test that invalid row index returns an index error"""
         game = self.client.post('/game/')
         game_id = game.data['id']
-        payload = {'row': -1, 'col': 0}
+        payload = {'row': -1, 'col': 0, 'test': True}
         res = self.client.put(
             f'/game/{game_id}/',
             data=payload,
@@ -63,7 +65,7 @@ class GameTests(TestCase):
         """Test that making a move in index with preexisting piece fails"""
         game = self.client.post('/game/')
         game_id = game.data['id']
-        payload = {'row': 0, 'col': 0}
+        payload = {'row': 0, 'col': 0, 'test': True}
         self.client.put(
             f'/game/{game_id}/',
             data=payload,
@@ -81,11 +83,11 @@ class GameTests(TestCase):
         game = self.client.post('/game/')
         game_id = game.data['id']
         payload = [
-            {'row': 0, 'col': 0},
-            {'row': 0, 'col': 1},
-            {'row': 0, 'col': 2},
-            {'row': 0, 'col': 3},
-            {'row': 0, 'col': 4}
+            {'row': 0, 'col': 0, 'test': True},
+            {'row': 0, 'col': 1, 'test': True},
+            {'row': 0, 'col': 2, 'test': True},
+            {'row': 0, 'col': 3, 'test': True},
+            {'row': 0, 'col': 4, 'test': True}
         ]
         res = None
         for p in payload:
@@ -95,19 +97,19 @@ class GameTests(TestCase):
                 content_type='application/json'
             )
         self.assertEqual(res.status_code, 200)
-        self.assertEquals(res.data['status'], 'Finished')
-        self.assertNotEqual(res.data['winner'], 0)
+        self.assertEqual(res.data['status'], 'Finished')
+        self.assertEqual(res.data['winner'], 1)
 
     def test_winner_row(self):
         """Test for winner when there's horizontal 5"""
         game = self.client.post('/game/')
         game_id = game.data['id']
         payload = [
-            {'row': 0, 'col': 0},
-            {'row': 1, 'col': 0},
-            {'row': 2, 'col': 0},
-            {'row': 3, 'col': 0},
-            {'row': 4, 'col': 0}
+            {'row': 0, 'col': 0, 'test': True},
+            {'row': 1, 'col': 0, 'test': True},
+            {'row': 2, 'col': 0, 'test': True},
+            {'row': 3, 'col': 0, 'test': True},
+            {'row': 4, 'col': 0, 'test': True}
         ]
         res = None
         for p in payload:
@@ -117,19 +119,19 @@ class GameTests(TestCase):
                 content_type='application/json'
             )
         self.assertEqual(res.status_code, 200)
-        self.assertEquals(res.data['status'], 'Finished')
-        self.assertNotEqual(res.data['winner'], 0)
+        self.assertEqual(res.data['status'], 'Finished')
+        self.assertEqual(res.data['winner'], 1)
 
     def test_winner_diagonal(self):
         """Test for winner when there's diagonal 5"""
         game = self.client.post('/game/')
         game_id = game.data['id']
         payload = [
-            {'row': 0, 'col': 0},
-            {'row': 1, 'col': 1},
-            {'row': 2, 'col': 2},
-            {'row': 3, 'col': 3},
-            {'row': 4, 'col': 4}
+            {'row': 0, 'col': 0, 'test': True},
+            {'row': 1, 'col': 1, 'test': True},
+            {'row': 2, 'col': 2, 'test': True},
+            {'row': 3, 'col': 3, 'test': True},
+            {'row': 4, 'col': 4, 'test': True}
         ]
         res = None
         for p in payload:
@@ -139,5 +141,58 @@ class GameTests(TestCase):
                 content_type='application/json'
             )
         self.assertEqual(res.status_code, 200)
-        self.assertEquals(res.data['status'], 'Finished')
-        self.assertNotEqual(res.data['winner'], 0)
+        self.assertEqual(res.data['status'], 'Finished')
+        self.assertEqual(res.data['winner'], 1)
+
+
+class GameFunctionalityTests(TestCase):
+
+    def setUp(self):
+        self.game = Game.objects.create()
+
+    def test_AI_find_choices(self):
+        """Test that AI has found proper choices"""
+        self.game.make_move(row=7, col=7)
+        choices = self.game.find_choices()
+        expected_choices = [
+            (6, 6),
+            (6, 7),
+            (6, 8),
+            (7, 6),
+            (7, 8),
+            (8, 6),
+            (8, 7),
+            (8, 8)
+        ]
+        self.assertEqual(choices, expected_choices)
+
+    def test_AI_find_choices_edge(self):
+        """
+            Test that AI has found proper choices
+            in the edge of the board
+        """
+        self.game.make_move(row=0, col=0)
+        choices = self.game.find_choices()
+        expected_choices = [
+            (0, 1),
+            (1, 0),
+            (1, 1)
+        ]
+        self.assertEqual(choices, expected_choices)
+
+    def test_AI_add_new_choices(self):
+        """
+            Test that AI properly updates choices when using
+            minimax algorithm to explore potential choices
+        """
+        self.game.make_move(row=7, col=7)
+        choices = self.game.find_choices()
+        self.game.make_move(row=7, col=6)
+        move = (7, 6)
+        additional_choices = self.game.add_new_choices(move, choices)
+        expected_additional_choices = [
+            (6, 5),
+            (7, 5),
+            (8, 5)
+        ]
+        self.assertEqual(additional_choices, expected_additional_choices)

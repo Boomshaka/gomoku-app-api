@@ -41,17 +41,25 @@ class GameDetails(APIView):
         game = self.get_object(pk)
         row = request.data['row']
         col = request.data['col']
+        testingClient = False
+        if 'test' in request.data and request.data['test']:
+            testingClient = True
 
         try:
             grid = game.make_move(row, col)
-            winner = game.check_winner()
-            game_status = 'Playing' if winner == 0 else 'Finished'
         except ValueError as e:
             message = {'detail': str(e)}
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
         except IndexError as e:
             message = {'detail': str(e)}
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
+
+        winner = game.check_winner()
+        if not testingClient:
+            grid = game.make_AI_move()
+            if winner is not 0:
+                winner = game.check_winner()
+        game_status = 'Playing' if winner == 0 else 'Finished'
 
         serializer = GameSerializer(
             game,
