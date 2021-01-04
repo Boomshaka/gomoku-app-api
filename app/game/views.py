@@ -37,7 +37,7 @@ class GameDetails(APIView):
         serializer = GameSerializer(game)
         return Response(serializer.data)
 
-    def put(self, request, pk):
+    def post(self, request, pk):
         game = self.get_object(pk)
         row = request.data.get('row')
         col = request.data.get('col')

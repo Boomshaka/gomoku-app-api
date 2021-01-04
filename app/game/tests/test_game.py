@@ -28,7 +28,7 @@ class GameTests(TestCase):
         game = self.client.post('/game/')
         game_id = game.data['id']
         payload = {'row': 7, 'col': 7, 'skip_AI': True}
-        res = self.client.put(
+        res = self.client.post(
             f'/game/{game_id}/',
             data=payload,
             content_type='application/json'
@@ -42,7 +42,7 @@ class GameTests(TestCase):
         game = self.client.post('/game/')
         game_id = game.data['id']
         payload = {'row': 0, 'col': -1, 'skip_AI': True}
-        res = self.client.put(
+        res = self.client.post(
             f'/game/{game_id}/',
             data=payload,
             content_type='application/json'
@@ -54,7 +54,7 @@ class GameTests(TestCase):
         game = self.client.post('/game/')
         game_id = game.data['id']
         payload = {'row': -1, 'col': 0, 'skip_AI': True}
-        res = self.client.put(
+        res = self.client.post(
             f'/game/{game_id}/',
             data=payload,
             content_type='application/json'
@@ -66,12 +66,12 @@ class GameTests(TestCase):
         game = self.client.post('/game/')
         game_id = game.data['id']
         payload = {'row': 0, 'col': 0, 'skip_AI': True}
-        self.client.put(
+        self.client.post(
             f'/game/{game_id}/',
             data=payload,
             content_type='application/json'
         )
-        res = self.client.put(
+        res = self.client.post(
             f'/game/{game_id}/',
             data=payload,
             content_type='application/json'
@@ -91,7 +91,7 @@ class GameTests(TestCase):
         ]
         res = None
         for p in payload:
-            res = self.client.put(
+            res = self.client.post(
                 f'/game/{game_id}/',
                 data=p,
                 content_type='application/json'
@@ -113,7 +113,7 @@ class GameTests(TestCase):
         ]
         res = None
         for p in payload:
-            res = self.client.put(
+            res = self.client.post(
                 f'/game/{game_id}/',
                 data=p,
                 content_type='application/json'
@@ -135,7 +135,7 @@ class GameTests(TestCase):
         ]
         res = None
         for p in payload:
-            res = self.client.put(
+            res = self.client.post(
                 f'/game/{game_id}/',
                 data=p,
                 content_type='application/json'
@@ -149,7 +149,7 @@ class GameTests(TestCase):
         game = self.client.post('/game/')
         game_id = game.data['id']
         payload = {'row': 7, 'col': 7}
-        res = self.client.put(
+        res = self.client.post(
             f'/game/{game_id}/',
             data=payload,
             content_type='application/json'
