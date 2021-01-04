@@ -10,6 +10,10 @@ METHODS
 #### Create a new game
 Request Example:
 http://localhost:8000/game/
+
+Example curl command:
+
+curl -H "Content-Type: application/json" -X POST http://localhost:8000/game/
 	
 | Method | URL Parameter | Request Payload | Response Body   |
 |--------|---------------|-----------------|-----------------|
@@ -24,10 +28,14 @@ Response Example:
   "date":"2021-01-04T03:03:27.233112Z"}
   ```
 
-### GET base_url/game/{uuid:id}
+### GET base_url/game/{uuid:id}/
 #### Get a game
 Request Example:
 http://localhost:8000/game/74371eb5-2529-43ba-97a8-0ea6e1046e58/
+
+Example curl command:
+
+curl -H "Content-Type: application/json" http://localhost:8000/game/74371eb5-2529-43ba-97a8-0ea6e1046e58/
 
 | Method | URL Parameter | Request Payload | Response Body   |
 |--------|---------------|-----------------|-----------------|
@@ -42,12 +50,25 @@ Response Example:
   "date":"2021-01-04T03:03:27.233112Z"}  
   ```
   
-  ### POST base_url/game/{uuid:id}
+  ### POST base_url/game/{uuid:id}/
   #### Make a move
   Request Example:
   http://localhost:8000/game/74371eb5-2529-43ba-97a8-0ea6e1046e58/
+  
+  Example curl command:
+  
+  curl -d '{"row": 0, "col": 1}' -H 'Content-Type: application/json' -X POST http://localhost:8000/game/74371eb5-2529-43ba-97a8-0ea6e1046e58/
 
-| Method | URL Parameter | Request Payload | Response Body   |
-|--------|---------------|-----------------|-----------------|
-|  POST  |      id       | row, col        | game json object|
+| Method | URL Parameter | Request Payload  | Response Body   |
+|--------|---------------|------------------|-----------------|
+|  POST  |      id       | JSON: {row, col} | game json object|
+
+Response Example:
+  ```json
+  {"id":"74371eb5-2529-43ba-97a8-0ea6e1046e58",
+  "grid":[[2,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]],
+  "winner":0,
+  "status":"Started",
+  "date":"2021-01-04T03:03:27.233112Z"}  
+  ```
 
