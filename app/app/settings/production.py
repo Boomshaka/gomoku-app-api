@@ -3,7 +3,7 @@ import os
 import dj_database_url
 
 
-DEBUG = False
+DEBUG = True
 ALLOWED_HOSTS = ['gomoku-api.herokuapp.com']
 DATABASES = {
     'default': dj_database_url.parse(os.environ.get('DATABASE_URL'))
