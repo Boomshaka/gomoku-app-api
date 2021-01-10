@@ -4,12 +4,9 @@ import os
 DEBUG = True
 ALLOWED_HOSTS = ['*']
 
-
-print("\n\n\n\n\n\n\n\n\n\n\n\n\nTRAVIISSS\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
 SECRET_KEY = '2+o5#_zrzp7*6b#o(uiw@99%(*w!!^%tr#m@3&p+g+2=qx(2lv'
 DEBUG = False
 TEMPLATE_DEBUG = True
-
 
 DATABASES = {
     'default': {
