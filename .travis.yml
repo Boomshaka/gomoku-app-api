@@ -4,9 +4,9 @@ python:
 services:
 - docker
 before_script: pip install docker-compose
-# script:
-# - docker-compose run app sh -c "python manage.py test --settings=app.settings.ci &&
-#   flake8"
+script:
+- docker-compose run app sh -c "python manage.py test --settings=app.settings.ci &&
+  flake8"
 env:
   global:
     secure: CRdZZhSXC6RylGk2wfNvEXdxGA7cXpvB05KuV9GlOabd31nCO6vlKbhQ/t2PRW2SYNc9dIXKVUjZaHoLeM2rkytpOmoY2jJn6sieqV/+Lbaln4alpxVZNoU/HRLGigqgiyrCj1aSt9dUG6NhzQ/W6R/3KTxi4eowuXTV8xpSf/4XIBVA0mhqCptFhlWlrI0KEb1r45sMBeXS7enlqX+RG8UJMwQQ11obRcS/ahPCTI1VG7liSZ1lrlnCG/LM51xnb2CRQrzn2DNuCW4Hu4Y4G4mBtwsufOOom5vpgHm60X9xAwCt16Rwjx8yAtRD3arXuNhQtGgQwotPC32MpCq8Td5P5pmGu7bKCvCbQNbjGBnPQPg4Ej2ddYzZ6j+ZVZnS4VErPIhs2jg34VBg0J5C56A2xRL9DVKDevKAoWiE0DH3BGFS1cdV91TUw3Eq39WBFeTZG8xnvj6cLWbC1kf4mucmnlnKplkWkociAr3UI1ELMx3bCbE4EG+614FewNmuir+Gnr+zObgsA2+vNd+0i0QALPqe5n6KpsxP9Q1eo6PbZetBEuVYDh6r6tSFgTI6XN6zGN2WIvespOQb5n5DqNdMDuah9qcJYyuANjljQN4Pt7udylyfhUpwimxxlez2QNVnFZXG/YWvbeFWCLbXX57bpNJP3+35C3MMkWfwxrs=
