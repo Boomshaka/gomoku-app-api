@@ -17,6 +17,7 @@ services:
       - DB_NAME=app
       - DB_USER=postgres
       - DB_PASS=samplepassword
+      - DATABASE_URL=postgres://aqybdovapadtju:d088811cc22d6733c55560b12ab810c2495346f78790442b4f1bb17d0d5ca505@ec2-52-22-135-159.compute-1.amazonaws.com:5432/dahbk0d7q6agc7
     depends_on:
       - db
   
