@@ -26,7 +26,8 @@ SECRET_KEY = '(b#=y96qg*6^870$-ug$ef+mm+d1me83vf6(!8t3qps=)t=3^#'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['gomoku-api.herokuapp.com']
+# ALLOWED_HOSTS = ['gomoku-api.herokuapp.com']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -133,4 +134,3 @@ DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True
 DATABASES = {
     'default': dj_database_url.parse(os.environ.get('DATABASE_URL'))
 }
-# DATABASES['default']['ENGINE'] = 'django.db.backends.postgresql'
