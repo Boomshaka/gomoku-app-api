@@ -3,6 +3,9 @@ python:
 - '3.7'
 services:
 - docker
+env:
+  global:
+    BUILD_ON_TRAVIS=true
 before_script: pip install docker-compose
 script:
 - docker-compose run app sh -c "python manage.py test --settings=app.settings.ci &&
