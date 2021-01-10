@@ -26,7 +26,7 @@ SECRET_KEY = '(b#=y96qg*6^870$-ug$ef+mm+d1me83vf6(!8t3qps=)t=3^#'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['gomoku-api.herokuapp.com']
 
 
 # Application definition
