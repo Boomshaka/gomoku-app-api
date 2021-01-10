@@ -46,6 +46,10 @@ class GameDetails(APIView):
             request.data['skip_AI'] else False
         )
 
+        if game.status == 'Finished':
+            message = {'detail': 'Game has finished'}
+            return Response(message, status=status.HTTP_400_BAD_REQUEST)
+
         try:
             grid = game.make_move(row, col)
         except ValueError as e:
