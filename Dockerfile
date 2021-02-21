@@ -4,6 +4,9 @@ MAINTAINER Shaka Kanenobu
 ENV PYTHONUNBUFFERED 1
 
 COPY ./requirements.txt /requirements.txt
+COPY ./wait-for-it.sh ./wait-for-it.sh
+RUN chmod +x ./wait-for-it.sh
+
 RUN apk add --update --no-cache postgresql-client
 RUN apk add --update --no-cache --virtual .temp-build-dep \ 
     gcc libc-dev linux-headers postgresql-dev
@@ -18,8 +21,5 @@ COPY ./app /app
 
 RUN adduser -D user
 USER user
-
-COPY wait-for-it.sh wait_for_it.sh
-RUN chmod + x wait-for-it.sh
 
 CMD ["./wait-for-it.sh", "db:5432", "--", "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
