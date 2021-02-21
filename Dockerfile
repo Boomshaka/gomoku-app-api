@@ -10,9 +10,16 @@ RUN apk add --update --no-cache --virtual .temp-build-dep \
 RUN pip install -r /requirements.txt
 RUN apk del .temp-build-dep
 
+
 RUN mkdir /app
 WORKDIR /app
 COPY ./app /app
 
+
 RUN adduser -D user
 USER user
+
+COPY wait-for-it.sh wait_for_it.sh
+RUN chmod + x wait-for-it.sh
+
+CMD ["./wait-for-it.sh", "db:5432", "--", "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
