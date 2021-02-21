@@ -16,7 +16,8 @@ services:
       - DATABASE_URL=${DATABASE_URL}
       - SECRET_KEY=${SECRET_KEY}
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     command: >
       sh -c "
             python manage.py wait_for_db &&
@@ -30,5 +31,10 @@ services:
       - POSTGRES_DB=app
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=samplepassword
+    healthcheck:
+      test: ["CMD-SHELL","pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 
