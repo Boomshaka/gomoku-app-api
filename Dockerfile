@@ -4,8 +4,7 @@ MAINTAINER Shaka Kanenobu
 ENV PYTHONUNBUFFERED 1
 
 COPY ./requirements.txt /requirements.txt
-COPY ./wait-for-it.sh ./wait-for-it.sh
-RUN chmod +x ./wait-for-it.sh
+
 
 RUN apk add --update --no-cache postgresql-client
 RUN apk add --update --no-cache --virtual .temp-build-dep \ 
@@ -17,6 +16,8 @@ RUN apk del .temp-build-dep
 RUN mkdir /app
 WORKDIR /app
 COPY ./app /app
+
+RUN chmod +x ./wait-for-it.sh
 
 
 RUN adduser -D user
