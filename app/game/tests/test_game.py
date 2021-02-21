@@ -12,7 +12,6 @@ class GameTests(TestCase):
     def test_create_game_successful(self):
         """Test creating a new game is successful"""
         game = self.client.post('/api/game/')
-        # print("CONTENTTTT:",game.content)
         self.assertContains(game, 'id', status_code=201)
         self.assertEqual(game.data['status'], 'Started')
         self.assertEqual(game.data['winner'], 0)
