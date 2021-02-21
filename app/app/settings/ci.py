@@ -5,7 +5,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 SECRET_KEY = '2+o5#_zrzp7*6b#o(uiw@99%(*w!!^%tr#m@3&p+g+2=qx(2lv'
-DEBUG = False
+# DEBUG = False
 TEMPLATE_DEBUG = True
 
 DATABASES = {
