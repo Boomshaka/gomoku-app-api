@@ -11,25 +11,25 @@ class GameTests(TestCase):
 
     def test_create_game_successful(self):
         """Test creating a new game is successful"""
-        game = self.client.post('/api/game/')
+        game = self.client.post('/game/')
         self.assertContains(game, 'id', status_code=201)
         self.assertEqual(game.data['status'], 'Started')
         self.assertEqual(game.data['winner'], 0)
 
     def test_fetch_game_successful(self):
         """Test that game with id exists"""
-        new_game = self.client.post('/api/game/')
+        new_game = self.client.post('/game/')
         game_id = new_game.data['id']
-        game = self.client.get(f'/api/game/{game_id}/')
+        game = self.client.get(f'/game/{game_id}/')
         self.assertContains(game, game_id, count=1, status_code=200)
 
     def test_make_move_successful(self):
         """Test that game piece can be placed in grid with PUT request"""
-        game = self.client.post('/api/game/')
+        game = self.client.post('/game/')
         game_id = game.data['id']
         payload = {'row': 7, 'col': 7, 'skip_AI': True}
         res = self.client.post(
-            f'/api/game/{game_id}/',
+            f'/game/{game_id}/',
             data=payload,
             content_type='application/json'
         )
@@ -39,11 +39,11 @@ class GameTests(TestCase):
 
     def test_invalid_index_col(self):
         """Test that invalid col index returns an index error"""
-        game = self.client.post('/api/game/')
+        game = self.client.post('/game/')
         game_id = game.data['id']
         payload = {'row': 0, 'col': -1, 'skip_AI': True}
         res = self.client.post(
-            f'/api/game/{game_id}/',
+            f'/game/{game_id}/',
             data=payload,
             content_type='application/json'
         )
@@ -51,11 +51,11 @@ class GameTests(TestCase):
 
     def test_invalid_index_row(self):
         """Test that invalid row index returns an index error"""
-        game = self.client.post('/api/game/')
+        game = self.client.post('/game/')
         game_id = game.data['id']
         payload = {'row': -1, 'col': 0, 'skip_AI': True}
         res = self.client.post(
-            f'/api/game/{game_id}/',
+            f'/game/{game_id}/',
             data=payload,
             content_type='application/json'
         )
@@ -63,16 +63,16 @@ class GameTests(TestCase):
 
     def test_index_exists(self):
         """Test that making a move in index with preexisting piece fails"""
-        game = self.client.post('/api/game/')
+        game = self.client.post('/game/')
         game_id = game.data['id']
         payload = {'row': 0, 'col': 0, 'skip_AI': True}
         self.client.post(
-            f'/api/game/{game_id}/',
+            f'/game/{game_id}/',
             data=payload,
             content_type='application/json'
         )
         res = self.client.post(
-            f'/api/game/{game_id}/',
+            f'/game/{game_id}/',
             data=payload,
             content_type='application/json'
         )
@@ -80,7 +80,7 @@ class GameTests(TestCase):
 
     def test_winner_col(self):
         """Test for winner when there's vertical 5"""
-        game = self.client.post('/api/game/')
+        game = self.client.post('/game/')
         game_id = game.data['id']
         payload = [
             {'row': 0, 'col': 0, 'skip_AI': True},
@@ -92,7 +92,7 @@ class GameTests(TestCase):
         res = None
         for p in payload:
             res = self.client.post(
-                f'/api/game/{game_id}/',
+                f'/game/{game_id}/',
                 data=p,
                 content_type='application/json'
             )
@@ -102,7 +102,7 @@ class GameTests(TestCase):
 
     def test_winner_row(self):
         """Test for winner when there's horizontal 5"""
-        game = self.client.post('/api/game/')
+        game = self.client.post('/game/')
         game_id = game.data['id']
         payload = [
             {'row': 0, 'col': 0, 'skip_AI': True},
@@ -114,7 +114,7 @@ class GameTests(TestCase):
         res = None
         for p in payload:
             res = self.client.post(
-                f'/api/game/{game_id}/',
+                f'/game/{game_id}/',
                 data=p,
                 content_type='application/json'
             )
@@ -124,7 +124,7 @@ class GameTests(TestCase):
 
     def test_winner_diagonal(self):
         """Test for winner when there's diagonal 5"""
-        game = self.client.post('/api/game/')
+        game = self.client.post('/game/')
         game_id = game.data['id']
         payload = [
             {'row': 0, 'col': 0, 'skip_AI': True},
@@ -136,7 +136,7 @@ class GameTests(TestCase):
         res = None
         for p in payload:
             res = self.client.post(
-                f'/api/game/{game_id}/',
+                f'/game/{game_id}/',
                 data=p,
                 content_type='application/json'
             )
@@ -146,11 +146,11 @@ class GameTests(TestCase):
 
     def test_AI_make_move_successful(self):
         """Test that AI makes move after player"""
-        game = self.client.post('/api/game/')
+        game = self.client.post('/game/')
         game_id = game.data['id']
         payload = {'row': 7, 'col': 7}
         res = self.client.post(
-            f'/api/game/{game_id}/',
+            f'/game/{game_id}/',
             data=payload,
             content_type='application/json'
         )
