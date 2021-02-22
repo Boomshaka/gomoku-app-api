@@ -47,7 +47,8 @@ class GameTests(TestCase):
             data=payload,
             content_type='application/json'
         )
-        self.assertEqual(res.status_code, 400)
+        self.assertContains(res, 'detail', status_code=400)
+        self.assertEqual(res.json()['type'], 'IndexError')
 
     def test_invalid_index_row(self):
         """Test that invalid row index returns an index error"""
@@ -59,7 +60,8 @@ class GameTests(TestCase):
             data=payload,
             content_type='application/json'
         )
-        self.assertEqual(res.status_code, 400)
+        self.assertContains(res, 'detail', status_code=400)
+        self.assertEqual(res.json()['type'], 'IndexError')
 
     def test_index_exists(self):
         """Test that making a move in index with preexisting piece fails"""
@@ -76,7 +78,8 @@ class GameTests(TestCase):
             data=payload,
             content_type='application/json'
         )
-        self.assertEqual(res.status_code, 400)
+        self.assertContains(res, 'detail', status_code=400)
+        self.assertEqual(res.json()['type'], 'ValueError')
 
     def test_winner_col(self):
         """Test for winner when there's vertical 5"""
@@ -154,6 +157,10 @@ class GameTests(TestCase):
             data=payload,
             content_type='application/json'
         )
+        self.assertContains(res, 'row', status_code=200)
+        self.assertContains(res, 'col', status_code=200)
+        self.assertGreater(res.json()['row'], -1)
+        self.assertGreater(res.json()['col'], -1)
 
         numOne = 0
         for row in res.data['grid']:

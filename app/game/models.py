@@ -55,6 +55,9 @@ class Game(models.Model):
     )
     date = models.DateTimeField(auto_now_add=True)
 
+    row = models.IntegerField(default=-1)
+    col = models.IntegerField(default=-1)
+
     def get(self, row, col):
         """Get value at given row,col position"""
         if row < 0 or col < 0 or row >= GRID_SIZE or col >= GRID_SIZE:
@@ -405,7 +408,7 @@ class Game(models.Model):
         val = self.choose_AI_move()
         row = val.get('choice')[0]
         col = val.get('choice')[1]
-        return self.make_move(row, col, player=1)
+        return self.make_move(row, col, player=1), row, col
 
     def make_move(self, row, col, player=2):
         """Fills grid index specified by row,col"""

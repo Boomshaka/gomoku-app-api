@@ -47,27 +47,39 @@ class GameDetails(APIView):
         )
 
         if game.status == 'Finished':
-            message = {'detail': 'Game has finished'}
+            message = {
+                'type': 'Finished',
+                'detail': 'Game has finished'
+            }
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             grid = game.make_move(row, col)
         except ValueError as e:
-            message = {'detail': str(e)}
+            message = {
+                'type': 'ValueError',
+                'detail': str(e)
+            }
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
         except IndexError as e:
-            message = {'detail': str(e)}
+            message = {
+                'type': 'IndexError',
+                'detail': str(e)
+            }
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
         winner = game.check_winner()
 
+        row_resp, col_resp = -1, -1
         if not skip_AI and winner == 0:
-            grid = game.make_AI_move()
+            grid, row_resp, col_resp = game.make_AI_move()
             winner = game.check_winner()
         game_status = 'Playing' if winner == 0 else 'Finished'
 
         serializer = GameSerializer(
             game,
             data={
+                'row': row_resp,
+                'col': col_resp,
                 'grid': grid,
                 'status': game_status,
                 'winner': winner
