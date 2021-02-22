@@ -78,8 +78,8 @@ class GameDetails(APIView):
         serializer = GameSerializer(
             game,
             data={
-                'row': row_resp,
-                'col': col_resp,
+                'resp_row': row_resp,
+                'resp_col': col_resp,
                 'grid': grid,
                 'status': game_status,
                 'winner': winner

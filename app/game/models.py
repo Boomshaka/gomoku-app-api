@@ -55,8 +55,8 @@ class Game(models.Model):
     )
     date = models.DateTimeField(auto_now_add=True)
 
-    row = models.IntegerField(default=-1)
-    col = models.IntegerField(default=-1)
+    resp_row = models.IntegerField(default=-1)
+    resp_col = models.IntegerField(default=-1)
 
     def get(self, row, col):
         """Get value at given row,col position"""

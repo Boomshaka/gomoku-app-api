@@ -157,10 +157,10 @@ class GameTests(TestCase):
             data=payload,
             content_type='application/json'
         )
-        self.assertContains(res, 'row', status_code=200)
-        self.assertContains(res, 'col', status_code=200)
-        self.assertGreater(res.json()['row'], -1)
-        self.assertGreater(res.json()['col'], -1)
+        self.assertContains(res, 'resp_row', status_code=200)
+        self.assertContains(res, 'resp_col', status_code=200)
+        self.assertGreater(res.json()['resp_row'], -1)
+        self.assertGreater(res.json()['resp_col'], -1)
 
         numOne = 0
         for row in res.data['grid']:
